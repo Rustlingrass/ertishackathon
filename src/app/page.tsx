@@ -49,6 +49,11 @@ export default function Home() {
   const [filteredReports, setFilteredReports] = useState<any[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<'all' | 'received' | 'in_process' | 'done'>('all');
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    status: 'all' as 'all' | 'received' | 'in_process' | 'done',
+    priority: 'all' as 'all' | 'low' | 'medium' | 'high' | 'critical',
+    category: 'all' as string,
+  });
 
   const BACKEND_BASE_URL = 'https://localhost:3001'; // Ask your friend for exact domain/IP
   const BACKEND_URL = 'http://localhost:3001/reports'; // DEMO BACKEND URL
@@ -67,6 +72,21 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    let filtered = reports;
+
+    if (filters.status !== 'all') {
+      filtered = filtered.filter(r => r.status === filters.status);
+    }
+    if (filters.priority !== 'all') {
+      filtered = filtered.filter(r => r.priority === filters.priority);
+    }
+    if (filters.category !== 'all') {
+      filtered = filtered.filter(r => r.category === filters.category);
+    }
+
+    setFilteredReports(filtered);
+  }, [filters, reports]);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -320,11 +340,32 @@ export default function Home() {
                             </p>
 
                             <div className="mt-6 flex flex-wrap gap-3">
-                              <Badge className={report.priority === 'high' ? 'bg-red-500' : report.priority === 'medium' ? 'bg-orange-500' : 'bg-green-500'}>
-                                {report.priority === 'high' ? 'Высокий' : report.priority === 'medium' ? 'Средний' : 'Низкий'}
+                              <Badge
+                                className={cn(
+                                  "font-semibold",
+                                  report.priority === 'critical' && "bg-red-700 text-white animate-pulse ring-2 ring-red-400",
+                                  report.priority === 'high' && "bg-red-600 text-white",
+                                  report.priority === 'medium' && "bg-orange-500 text-white",
+                                  report.priority === 'low' && "bg-green-600 text-white"
+                                )}
+                              >
+                                {report.priority === 'critical' && "КРИТИЧЕСКИЙ"}
+                                {report.priority === 'high' && "Высокий"}
+                                {report.priority === 'medium' && "Средний"}
+                                {report.priority === 'low' && "Низкий"}
                               </Badge>
-                              <Badge className={report.status === 'done' ? 'bg-green-600' : report.status === 'in_process' ? 'bg-yellow-600' : 'bg-blue-600'}>
-                                {report.status === 'received' ? 'Получено' : report.status === 'in_process' ? 'В работе' : 'Выполнено'}
+
+                              {/* Статус */}
+                              <Badge
+                                className={cn(
+                                  "text-white font-medium",
+                                  report.status === 'done' && "bg-green-600",
+                                  report.status === 'in_process' && "bg-yellow-600",
+                                  report.status === 'received' && "bg-blue-600"
+                                )}
+                              >
+                                {report.status === 'received' ? 'Получено' :
+                                  report.status === 'in_process' ? 'В работе' : 'Выполнено'}
                               </Badge>
                             </div>
 
@@ -348,90 +389,133 @@ export default function Home() {
               </span> из {reports.filter(r => r.location !== null).length} с геолокацией
             </p>
           </div>
-          {/* Status Filter Buttons — обновлённая версия */}
-          <div className="flex flex-wrap justify-center gap-6 mt-10">
-            {/* КНОПКА "ВСЕ" — теперь ОГОНЬ */}
-            <Button
-              size="lg"
-              variant={selectedFilter === 'all' ? 'default' : 'outline'}
-              onClick={() => setSelectedFilter('all')}
-              className={cn(
-                "min-w-48 gap-3 text-lg font-semibold transition-all duration-300 ease-out",
-                "hover:scale-105 hover:shadow-xl",
-                selectedFilter === 'all'
-                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-orange-500/50 shadow-lg scale-105"
-                  : "border-2 border-orange-300 text-orange-700 hover:bg-orange-50"
-              )}
-            >
-              <motion.div
-                animate={{ rotate: selectedFilter === 'all' ? [0, -10, 10, -10, 0] : 0 }}
-                transition={{ duration: 0.5, repeat: selectedFilter === 'all' ? 1 : 0 }}
-              >
-                <List className="w-6 h-6" />
-              </motion.div>
-              Показать все
-              <span className="ml-2 px-3 py-1 bg-white/20 rounded-full text-sm">
-                {reports.length}
-              </span>
-            </Button>
+          {/* === НОВЫЙ УМНЫЙ ФИЛЬТР === */}
+          <div className="w-full max-w-5xl mx-auto mt-12 mb-8">
+            <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+              <h3 className="text-2xl font-bold text-center mb-8 text-gray-800">
+                Фильтры
+              </h3>
 
-            {/* Остальные кнопки — чуть улучшил цвета и анимацию */}
-            <Button
-              size="lg"
-              variant={selectedFilter === 'received' ? 'default' : 'outline'}
-              onClick={() => setSelectedFilter('received')}
-              className={cn(
-                "min-w-48 gap-3 text-lg font-semibold transition-all duration-300",
-                "hover:scale-105",
-                selectedFilter === 'received'
-                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30"
-                  : "border-2 border-blue-400 text-blue-700 hover:bg-blue-50"
-              )}
-            >
-              <Circle className="w-5 h-5" />
-              Получено
-              <span className="ml-2 px-3 py-1 bg-white/20 rounded-full text-sm">
-                {reports.filter(r => r.status === 'received').length}
-              </span>
-            </Button>
+              <div className="grid md:grid-cols-3 gap-8">
 
-            <Button
-              size="lg"
-              variant={selectedFilter === 'in_process' ? 'default' : 'outline'}
-              onClick={() => setSelectedFilter('in_process')}
-              className={cn(
-                "min-w-48 gap-3 text-lg font-semibold transition-all duration-300",
-                "hover:scale-105",
-                selectedFilter === 'in_process'
-                  ? "bg-yellow-600 hover:bg-yellow-700 text-white shadow-lg shadow-yellow-500/30"
-                  : "border-2 border-yellow-400 text-yellow-700 hover:bg-yellow-50"
-              )}
-            >
-              <Clock className="w-5 h-5" />
-              В процессе
-              <span className="ml-2 px-3 py-1 bg-white/20 rounded-full text-sm">
-                {reports.filter(r => r.status === 'in_process').length}
-              </span>
-            </Button>
+                {/* 1. Статус */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-3 block">
+                    Статус заявки
+                  </label>
+                  <div className="space-y-3">
+                    {(['all', 'received', 'in_process', 'done'] as const).map((status) => (
+                      <label key={status} className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="status"
+                          checked={filters.status === status}
+                          onChange={() => setFilters(prev => ({ ...prev, status }))}
+                          className="w-5 h-5 text-orange-600 focus:ring-orange-500"
+                        />
+                        <span className="flex items-center gap-2">
+                          {status === 'all' && <List className="w-4 h-4" />}
+                          {status === 'received' && <Circle className="w-4 h-4 text-red-500" />}
+                          {status === 'in_process' && <Clock className="w-4 h-4 text-yellow-600" />}
+                          {status === 'done' && <CheckCircle className="w-4 h-4 text-green-600" />}
+                          {status === 'all' ? 'Все заявки' :
+                            status === 'received' ? 'Получено' :
+                              status === 'in_process' ? 'В работе' : 'Выполнено'}
+                          <span className="text-xs text-gray-500 ml-auto">
+                            ({status === 'all' ? reports.length : reports.filter(r => r.status === status).length})
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
 
-            <Button
-              size="lg"
-              variant={selectedFilter === 'done' ? 'default' : 'outline'}
-              onClick={() => setSelectedFilter('done')}
-              className={cn(
-                "min-w-48 gap-3 text-lg font-semibold transition-all duration-300",
-                "hover:scale-105",
-                selectedFilter === 'done'
-                  ? "bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-500/30"
-                  : "border-2 border-green-400 text-green-700 hover:bg-green-50"
-              )}
-            >
-              <CheckCircle className="w-5 h-5" />
-              Выполнено
-              <span className="ml-2 px-3 py-1 bg-white/20 rounded-full text-sm">
-                {reports.filter(r => r.status === 'done').length}
-              </span>
-            </Button>
+                {/* 2. Приоритет */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-3 block">
+                    Приоритет
+                  </label>
+                  <div className="space-y-3">
+                    {(['all', 'low', 'medium', 'high', 'critical'] as const).map((prio) => (
+                      <label key={prio} className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="priority"
+                          checked={filters.priority === prio}
+                          onChange={() => setFilters(prev => ({ ...prev, priority: prio }))}
+                          className="w-5 h-5 text-orange-600 focus:ring-orange-500"
+                        />
+                        <span className={cn(
+                          "flex items-center gap-2 font-medium",
+                          prio === 'critical' && "text-red-600",
+                          prio === 'high' && "text-red-500",
+                          prio === 'medium' && "text-orange-600",
+                          prio === 'low' && "text-green-600"
+                        )}>
+                          {prio === 'all' ? 'Любой приоритет' :
+                            prio === 'critical' ? 'Критический' :
+                              prio === 'high' ? 'Высокий' :
+                                prio === 'medium' ? 'Средний' : 'Низкий'}
+                          {prio !== 'all' && (
+                            <span className="text-xs text-gray-500 ml-auto">
+                              ({reports.filter(r => r.priority === prio).length})
+                            </span>
+                          )}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Категория */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-700 mb-3 block">
+                    Тип проблемы
+                  </label>
+                  <select
+                    value={filters.category}
+                    onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition"
+                  >
+                    <option value="all">Все категории</option>
+                    {[
+                      "Дефекты дорог и тротуаров",
+                      "Незаконная парковка и нарушения ПДД",
+                      "Неисправное уличное освещение",
+                      "Детские и спортивные площадки",
+                      "Мусор и отходы",
+                      "Бездомные и мертвые животные",
+                      "Аварийные деревья и зелёные насаждения",
+                      "Открытые люки и ливнёвки",
+                      "Вандализм и граффити",
+                      "ДТП и его последствия",
+                      "Незаконная торговля и реклама",
+                      "Сосульки, снег и наледь",
+                      "Экологические проблемы",
+                      "Канализация и ливнёвки",
+                      "Общественный транспорт",
+                      "Велодорожки и самокаты",
+                      "Туалеты общественные",
+                      "Другое"
+                    ].map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Кнопка сброса */}
+              <div className="text-center mt-8">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setFilters({ status: 'all', priority: 'all', category: 'all' })}
+                  className="gap-2"
+                >
+                  Сбросить фильтры
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -55,6 +55,20 @@ export default function Home() {
   // const BACKEND_URL = `${BACKEND_BASE_URL}/api/admin/reports/`; // Full endpoint
 
   useEffect(() => {
+    // Убиваем скролл Leaflet навсегда
+    const killLeafletScroll = () => {
+      document.querySelectorAll('.leaflet-popup-content').forEach(el => {
+        el.removeAttribute('style');
+        (el as HTMLElement).style.overflow = 'hidden';
+      });
+    };
+    const observer = new MutationObserver(killLeafletScroll);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
+
+  useEffect(() => {
     const fetchReports = async () => {
       try {
         const res = await fetch(BACKEND_URL);
@@ -262,37 +276,64 @@ export default function Home() {
                       position={[report.location.lat, report.location.lon]}
                       icon={priorityIcons[report.priority as keyof typeof priorityIcons] || priorityIcons.low}
                     >
-                      <Popup className="custom-popup">
-                        <div className="p-3 max-w-xs">
+                      <Popup
+                        maxWidth={550}           // даём простор
+                        minWidth={350}
+                        maxHeight={500}
+                        closeButton={false}
+                        offset={[0, -20]}                    // чуть приподнимаем
+                        autoPan={false}
+                        className="jarqyn-popup"
+                      >
+                        {/* Обёртка, которая полностью перехватывает размеры */}
+                        <div className="w-full max-w-2xl mx-auto rounded-2xl overflow-hidden bg-white shadow-2xl">
+                          {/* Кастомная кнопка закрытия */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // @ts-ignore
+                              map.closePopup();
+                            }}
+                            className="absolute top-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-2xl font-light text-gray-600 shadow-lg backdrop-blur hover:bg-white"
+                          >
+                            ×
+                          </button>
+
+                          {/* Фото */}
                           {report.photo_url && (
-                            <Image
-                              src={report.photo_url}
-                              alt="Report"
-                              width={300}
-                              height={200}
-                              className="rounded-lg mb-3 object-cover w-full"
-                            />
+                            <div className="relative h-64 w-full">
+                              <Image
+                                src={report.photo_url}
+                                alt="Проблема"
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
                           )}
-                          <h3 className="font-bold text-lg">{report.category}</h3>
-                          <p className="text-sm font-medium mt-1">{report.title}</p>
-                          <p className="text-sm text-gray-700 my-2">{report.description}</p>
-                          <div className="flex gap-2 flex-wrap mt-3">
-                            <Badge variant={report.priority === 'high' ? 'destructive' : 'secondary'}>
-                              Приоритет: {report.priority === 'high' ? 'Высокий' : report.priority === 'medium' ? 'Средний' : 'Низкий'}
-                            </Badge>
-                            <Badge className={
-                              report.status === 'done' ? 'bg-green-500 text-white' :
-                                report.status === 'in_process' ? 'bg-yellow-500 text-white' :
-                                  'bg-blue-500 text-white'
-                            }>
-                              {report.status === 'received' ? 'Получено' :
-                                report.status === 'in_process' ? 'В процессе' :
-                                  'Выполнено'}
-                            </Badge>
+
+                          {/* Контент со своим скроллом */}
+                          <div className="max-h-[500px] overflow-y-auto px-6 pb-6 pt-4 scrollbar-thin scrollbar-thumb-orange-500 scrollbar-track-gray-100">
+                            <h3 className="text-lg font-bold text-orange-600">{report.category}</h3>
+                            <p className="mt-1 text-base font-semibold">{report.title}</p>
+                            <p className="mt-4 text-sm leading-relaxed text-gray-700">
+                              {report.description || 'Без описания'}
+                            </p>
+
+                            <div className="mt-6 flex flex-wrap gap-3">
+                              <Badge className={report.priority === 'high' ? 'bg-red-500' : report.priority === 'medium' ? 'bg-orange-500' : 'bg-green-500'}>
+                                {report.priority === 'high' ? 'Высокий' : report.priority === 'medium' ? 'Средний' : 'Низкий'}
+                              </Badge>
+                              <Badge className={report.status === 'done' ? 'bg-green-600' : report.status === 'in_process' ? 'bg-yellow-600' : 'bg-blue-600'}>
+                                {report.status === 'received' ? 'Получено' : report.status === 'in_process' ? 'В работе' : 'Выполнено'}
+                              </Badge>
+                            </div>
+
+                            <p className="mt-5 text-xs text-gray-500">
+                              {new Date(report.timestamp).toLocaleDateString('ru-KZ', {
+                                day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                              })}
+                            </p>
                           </div>
-                          <p className="text-xs text-gray-500 mt-2">
-                            {new Date(report.timestamp).toLocaleString('ru-RU')}
-                          </p>
                         </div>
                       </Popup>
                     </Marker>

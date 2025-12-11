@@ -1,3 +1,42 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* УБИЙСТВО СТАНДАРТНОГО СКРОЛЛА LEAFLET (2025 edition)
+.leaflet-popup-content-wrapper,
+.leaflet-popup-content {
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;   /* Главная строка
+  border-radius: 16px !important;
+}
+
+.leaflet-popup-content {
+  width: 100% !important;
+  max-height: none !important;   Вторая главная строка
+}
+
+/* Твой красивый скроллбар */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+.scrollbar-thin::-webkit-scrollbar {
+  width: 7px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #fb923c;
+  border-radius: 999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #f97316;
+}
+.jarqyn-popup .leaflet-popup {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+}

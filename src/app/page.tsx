@@ -55,9 +55,9 @@ export default function Home() {
     category: 'all' as string,
   });
 
-  const BACKEND_BASE_URL = 'https://localhost:3001'; // Ask your friend for exact domain/IP
-  const BACKEND_URL = 'http://localhost:3001/reports'; // DEMO BACKEND URL
-  // const BACKEND_URL = `${BACKEND_BASE_URL}/api/admin/reports/`; // Full endpoint
+  const BACKEND_BASE_URL = 'http://34.51.240.162:8000'; // Ask your friend for exact domain/IP
+  // const BACKEND_URL = 'http://localhost:3001/reports'; // DEMO BACKEND URL
+  const BACKEND_URL = `${BACKEND_BASE_URL}/api/admin/reports/`; // Full endpoint
 
   useEffect(() => {
     // Убиваем скролл Leaflet навсегда

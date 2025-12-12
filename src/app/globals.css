@@ -2,21 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* УБИЙСТВО СТАНДАРТНОГО СКРОЛЛА LEAFLET (2025 edition)
-.leaflet-popup-content-wrapper,
-.leaflet-popup-content {
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;   /* Главная строка
-  border-radius: 16px !important;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 }
-
-.leaflet-popup-content {
-  width: 100% !important;
-  max-height: none !important;   Вторая главная строка
-}
-
-/* Твой красивый скроллбар */
 .scrollbar-thin {
   scrollbar-width: thin;
 }

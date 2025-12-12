@@ -7,7 +7,7 @@ import { Toaster } from 'sonner'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Jarqın — Прозрачный Павлодар",
+  title: "Jarqyn",
   description: "Система отчетов о проблемах города",
 };
 

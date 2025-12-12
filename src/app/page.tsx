@@ -465,7 +465,7 @@ export default function Home() {
                   <MapClient filteredReports={filteredReports} />
                 )}
               </div>
-              <div className="text-center mb-6">
+              <div className="text-center mb-6"> 
                 <p className="text-lg text-gray-600">
                   Показано маркеров: <span className="font-bold text-black">
                     {filteredReports.filter(r => r.location !== null).length}

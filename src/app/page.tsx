@@ -390,7 +390,7 @@ export default function Home() {
                       {/* Icon 4 */}
                       <div className="bg-white rounded-full w-14 h-14 md:w-16 md:h-16 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                         <div className="relative w-10 h-10">
-                          <Image src="/icon-bus.png" alt="Icon" fill className="object-contain" />
+                          <Image src="/icon-animal.png" alt="Icon" fill className="object-contain" />
                         </div>
                       </div>
                     </div>
@@ -399,19 +399,19 @@ export default function Home() {
                       {/* Icon 5 */}
                       <div className="bg-white rounded-full w-14 h-14 md:w-16 md:h-16 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                         <div className="relative w-10 h-10">
-                          <Image src="/icon-bus.png" alt="Icon" fill className="object-contain" />
+                          <Image src="/icon-bike.png" alt="Icon" fill className="object-contain" />
                         </div>
                       </div>
                       {/* Icon 6 */}
                       <div className="bg-white rounded-full w-14 h-14 md:w-16 md:h-16 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                         <div className="relative w-10 h-10">
-                          <Image src="/icon-bus.png" alt="Icon" fill className="object-contain" />
+                          <Image src="/icon-bulb.png" alt="Icon" fill className="object-contain" />
                         </div>
                       </div>
                       {/* Icon 7 */}
                       <div className="bg-white rounded-full w-14 h-14 md:w-16 md:h-16 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                         <div className="relative w-10 h-10">
-                          <Image src="/icon-bus.png" alt="Icon" fill className="object-contain" />
+                          <Image src="/icon-news.png" alt="Icon" fill className="object-contain" />
                         </div>
                       </div>
                     </div>
@@ -420,7 +420,7 @@ export default function Home() {
                       {/* Icon 8 */}
                       <div className="bg-white rounded-full w-14 h-14 md:w-16 md:h-16 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
                         <div className="relative w-10 h-10">
-                          <Image src="/icon-bus.png" alt="Icon" fill className="object-contain" />
+                          <Image src="/icon-recycle.png" alt="Icon" fill className="object-contain" />
                         </div>
                       </div>
                       {/* Icon 9 */}
